@@ -9,10 +9,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -20,10 +16,10 @@ import frc.robot.Constants;
 public class Drivetrain extends SubsystemBase {
 
   // Motor Controllers
-  CANSparkMax leftFrontMotor = new CANSparkMax(Constants.DrivetrainConstants.leftFrontMotorPort, CANSparkLowLevel.MotorType.kBrushless);
-  CANSparkMax leftBackMotor = new CANSparkMax(Constants.DrivetrainConstants.leftBackMotorPort, CANSparkLowLevel.MotorType.kBrushless);
-  CANSparkMax rightFrontMotor = new CANSparkMax(Constants.DrivetrainConstants.rightFrontMotorPort, CANSparkLowLevel.MotorType.kBrushless);
-  CANSparkMax rightBackMotor = new CANSparkMax(Constants.DrivetrainConstants.rightBackMotorPort, CANSparkLowLevel.MotorType.kBrushless);
+  CANSparkMax leftFrontMotor = new CANSparkMax(Constants.DrivetrainConstants.LEFT_FRONT_MOTOR_PORT, CANSparkLowLevel.MotorType.kBrushless);
+  CANSparkMax leftBackMotor = new CANSparkMax(Constants.DrivetrainConstants.LEFT_BACK_MOTOR_PORT, CANSparkLowLevel.MotorType.kBrushless);
+  CANSparkMax rightFrontMotor = new CANSparkMax(Constants.DrivetrainConstants.RIGHT_FRONT_MOTOR_PORT, CANSparkLowLevel.MotorType.kBrushless);
+  CANSparkMax rightBackMotor = new CANSparkMax(Constants.DrivetrainConstants.RIGHT_BACK_MOTOR_PORT, CANSparkLowLevel.MotorType.kBrushless);
 
   // Encoders
   RelativeEncoder leftEncoder = leftFrontMotor.getEncoder();

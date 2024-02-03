@@ -14,13 +14,13 @@ package frc.robot;
  */
 public final class Constants {
   public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
+    public static final int DRIVER_CONTROLLER_PORT = 0;
   }
 
   public static class DrivetrainConstants {
-    public static final int leftBackMotorPort = 1;
-    public static final int leftFrontMotorPort = 2;
-    public static final int rightBackMotorPort = 3;
-    public static final int rightFrontMotorPort = 4;
+    public static final int LEFT_BACK_MOTOR_PORT = 1;
+    public static final int LEFT_FRONT_MOTOR_PORT = 2;
+    public static final int RIGHT_BACK_MOTOR_PORT = 3;
+    public static final int RIGHT_FRONT_MOTOR_PORT = 4;
   }
 }

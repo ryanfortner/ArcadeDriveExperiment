@@ -23,7 +23,7 @@ public class RobotContainer {
   private final Drivetrain drivetrainSubsystem = new Drivetrain();
   private final DriveWithJoystick driveWithJoystick = new DriveWithJoystick(drivetrainSubsystem);
 
-  public static Joystick joystick = new Joystick(Constants.OperatorConstants.kDriverControllerPort);
+  public static Joystick joystick = new Joystick(Constants.OperatorConstants.DRIVER_CONTROLLER_PORT);
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
