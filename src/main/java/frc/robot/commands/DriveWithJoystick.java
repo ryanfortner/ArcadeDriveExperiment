@@ -35,7 +35,7 @@ public class DriveWithJoystick extends Command {
   public void execute() {
     double forwardSpeed = RobotContainer.joystick.getY() * 0.35;
     double turningSpeed = RobotContainer.joystick.getZ() * 0.35;
-    m_subsystem.diffDrive.arcadeDrive(forwardSpeed, turningSpeed);
+    m_subsystem.arcadeDrive(forwardSpeed, turningSpeed);
   }
 
   // Called once the command ends or is interrupted.
