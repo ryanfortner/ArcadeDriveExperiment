@@ -4,11 +4,27 @@
 
 package frc.robot;
 
+import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.DriveWithJoystick;
 import frc.robot.subsystems.Drivetrain;
+
+import java.util.List;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -51,7 +67,60 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return Autos.exampleAuto(drivetrainSubsystem);
+    // Create a voltage constraint to limit acceleration
+    var autoVoltageConstraint = 
+      new DifferentialDriveVoltageConstraint(
+        new SimpleMotorFeedforward(
+          AutoConstants.ksVolts, 
+          AutoConstants.kvVoltSecondsPerMeter,
+          AutoConstants.kaVoltSecondsSquaredPerMeter), 
+          AutoConstants.kDriveKinematics, 
+          6); // <- 6 volts, this can be changed, guide said 10
+
+    // Create config for trajectory
+    TrajectoryConfig config =
+      new TrajectoryConfig(
+        AutoConstants.kMaxSpeedMetersPerSecond, 
+        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+        // apply kinematics - ensures max speed is followed
+        .setKinematics(AutoConstants.kDriveKinematics)
+        // Apply voltage constraint
+        .addConstraint(autoVoltageConstraint);
+    
+    // S-shaped trajectory (all in meters)
+    Trajectory testTrajectory =
+      TrajectoryGenerator.generateTrajectory(
+        // Start at the origin facing +x dir'n
+        new Pose2d(0, 0, new Rotation2d(0)),
+        // Pass through two interior waypoints 
+        List.of(new Translation2d(1, 1), new Translation2d(2, -1)), 
+        // End 3 meters straight ahead, facing forward
+        new Pose2d(3, 0, new Rotation2d(0)), 
+        // Pass config
+        config);
+    
+    // This is the finicky part~ make sure to check all var names?
+    RamseteCommand ramseteCommand = 
+      new RamseteCommand(
+        testTrajectory,
+        drivetrainSubsystem::getPose,
+        new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
+        new SimpleMotorFeedforward(
+          AutoConstants.ksVolts, 
+          AutoConstants.kvVoltSecondsPerMeter, 
+          AutoConstants.kaVoltSecondsSquaredPerMeter),
+        AutoConstants.kDriveKinematics,
+        drivetrainSubsystem::getWheelSpeeds,
+        new PIDController(AutoConstants.kPDriveVel, 0, 0),
+        new PIDController(AutoConstants.kPDriveVel, 0, 0),
+        // RamseteCommand passes volts to the callback, so tankdrivevolts method required
+        drivetrainSubsystem::tankDriveVolts,
+        drivetrainSubsystem);
+    
+    // Reset odometry to initial pose of trajectory,
+    // run path, then stop at the end
+    return Commands.runOnce(() -> drivetrainSubsystem.resetOdometry(testTrajectory.getInitialPose()))
+      .andThen(ramseteCommand)
+      .andThen(Commands.runOnce(() -> drivetrainSubsystem.tankDriveVolts(0, 0)));
   }
 }
